@@ -3,13 +3,6 @@ using UnityEngine.Rendering;
 
 public class Underwater : MonoBehaviour
 {
-    public enum DepthZone
-    {
-        Surface,
-        Shallow,
-        Deep,
-        Abyss
-    }
 
     private Transform cameraTrans;
     private int waterLine = -2;
@@ -20,6 +13,15 @@ public class Underwater : MonoBehaviour
     [SerializeField] private VolumeProfile underwaterProfile;
     [SerializeField] private VolumeProfile surfaceProfile;
     [SerializeField] private VolumeProfile abyssProfile;
+
+    public enum DepthZone
+    {
+        Surface,
+        Shallow,
+        Deep,
+        Abyss
+    }
+
     private DepthZone currentZone;
     private Color targetFogColor;
 
