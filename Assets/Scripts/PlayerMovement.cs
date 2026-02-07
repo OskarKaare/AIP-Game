@@ -8,8 +8,10 @@ public class PlayerMovement : MonoBehaviour
     CharacterController controller;
     [SerializeField] private float mouseSpeed = 0.5f;
     private Camera playerCamera;
-    private float swimSpeed = 75;
-    private float maxSpeed = 15;
+    private float swimSpeed = 75f;
+    private float walkSpeed = 5f;
+    private float verticalSpeed;
+    private float maxSpeed = 15f;
     private float swimDrift = 0.1f;
     private Vector3 currentVelocity = Vector3.zero;
     private float decelerationTime = 0.5f;
@@ -28,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Swim();
+        MovementStyle();
         Look();
         //Vertical();
     }
@@ -64,6 +66,30 @@ public class PlayerMovement : MonoBehaviour
     //    controller.Move(verticalMove);
     //}
     
+    void MovementStyle()
+        {
+        if (transform.position.y > -2.5)
+        {
+            Walk();
+            Debug.Log("Walking");
+        }
+        else 
+        {
+            Swim();
+            Debug.Log("Swimming");
+        }
+    }
+
+    void Walk()
+    {    
+        Vector2 input = InputSystem.actions["Move"].ReadValue<Vector2>();
+        Vector3 move = (transform.right * input.x + transform.forward * input.y) *walkSpeed ;
+            verticalSpeed = -9f;
+            move.y = verticalSpeed;
+        controller.Move(move * Time.deltaTime);
+
+
+    }
     void Swim()
     {
         Vector2 input = InputSystem.actions["Move"].ReadValue<Vector2>();
