@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Jobs;
@@ -18,13 +19,14 @@ public class PlayerMovement : MonoBehaviour
     private float cameraXRotation = 0f;
     [SerializeField] private float minLookAngle = -90f;
     [SerializeField] private float maxLookAngle = 90f;
-    private bool isBoosting = false;
+    private Animator animator;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         controller = GetComponent<CharacterController>();
         playerCamera = Camera.main;
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -71,12 +73,10 @@ public class PlayerMovement : MonoBehaviour
         if (transform.position.y > -2.5)
         {
             Walk();
-            Debug.Log("Walking");
         }
         else 
         {
             Swim();
-            Debug.Log("Swimming");
         }
     }
 
@@ -86,7 +86,20 @@ public class PlayerMovement : MonoBehaviour
         Vector3 move = (transform.right * input.x + transform.forward * input.y) *walkSpeed ;
             verticalSpeed = -9f;
             move.y = verticalSpeed;
+        animator.SetFloat("Forward", input.y);
+        animator.SetFloat("Strafe", input.x);
         controller.Move(move * Time.deltaTime);
+
+        // set ani bool for walking
+        if (InputSystem.actions["Move"].IsPressed() && transform.position.y > -2.5f)
+        {
+            animator.SetBool("isWalking", true);
+        }
+        else
+        {
+            animator.SetBool("isWalking", false);
+        }
+
 
 
     }
@@ -103,19 +116,36 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            // No input - slow down to zero
             targetVelocity = Vector3.zero;
         }
         
-        // Smoothly interpolate current velocity toward target velocity
+        // lerp between the current velo and the targeted
         float lerpSpeed = input.magnitude > 0.1f ? swimDrift : 1f / decelerationTime;
         currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, Time.deltaTime * lerpSpeed);
-        if(!isBoosting)
+        // set max speed
         currentVelocity = Vector3.ClampMagnitude(currentVelocity, maxSpeed);
-        
+
         controller.Move(currentVelocity * Time.deltaTime);
 
-        Debug.Log(currentVelocity.magnitude);
+        if (transform.position.y <= -2.5f)
+        {
+            animator.SetBool("inWater", true);
+            if(InputSystem.actions["Move"].IsPressed() && transform.position.y <= -2.5f)
+            {
+                animator.SetBool("isSwimming", true);
+            }
+            else
+            {
+                animator.SetBool("isSwimming", false);
+            }
+        }
+        else
+        {
+                animator.SetBool("inWater", false);
+          
+        }
+
+        //Debug.Log(currentVelocity.magnitude);
     }
   
 
