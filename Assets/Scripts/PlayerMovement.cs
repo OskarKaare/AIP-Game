@@ -8,12 +8,10 @@ public class PlayerMovement : MonoBehaviour
     CharacterController controller;
     [SerializeField] private float mouseSpeed = 0.5f;
     private Camera playerCamera;
-    private float verticalSpeed = 5;
     private float swimSpeed = 75;
     private float maxSpeed = 15;
     private float swimDrift = 0.1f;
     private Vector3 currentVelocity = Vector3.zero;
-    private float currentVerticalVelocity = 0f;
     private float decelerationTime = 0.5f;
     private float cameraXRotation = 0f;
     [SerializeField] private float minLookAngle = -90f;
