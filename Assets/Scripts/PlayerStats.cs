@@ -86,18 +86,13 @@ public class PlayerStats : MonoBehaviour
 
     IEnumerator DamageFeedback()
     {
+        // get current profile, set vignette to flash red.
         if (postProcessVolume != null && postProcessVolume.profile != null)
         {
-            // Get vignette from CURRENT active profile
             if (postProcessVolume.profile.TryGet(out Vignette vignette))
             {
-                // Flash red
                 vignette.color.value = Color.red;
-               
-                
                 yield return new WaitForSeconds(0.2f);
-                
-                // Reset to black
                 vignette.color.value = Color.black;
             }
         }
