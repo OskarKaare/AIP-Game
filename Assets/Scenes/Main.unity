@@ -7502,9 +7502,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 2144495991}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a8fa248a18b1604488a71952418a7b72, type: 3}
+  m_Script: {fileID: 11500000, guid: 51a6c3faf3db9bb4db92f1094ba0a2a7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
+  health: 100
+  currentOxygen: 80
+  maxOxygen: 80
+  oxygenDepletionRate: 1
+  oxygenDepletionInterval: 1
+  oxygenReplenishmentRate: 4
 --- !u!4 &95399470581797740
 Transform:
   m_ObjectHideFlags: 0
