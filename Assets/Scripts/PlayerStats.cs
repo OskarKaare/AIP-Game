@@ -13,17 +13,32 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private float oxygenDepletionInterval = 1f;
     [SerializeField] private int oxygenReplenishmentRate = 1;
     [SerializeField] private float depthThreshold = -2.55f;
-    
-    public Volume postProcessVolume;
-    private Vignette vignette;
 
+    [SerializeField] private Volume postProcessVolume;
+    [SerializeField] private VolumeProfile[] allProfiles; // Add all your profiles here
 
     void Start()
     {
+        // Set all vignettes to black at start
+        InitializeVignettes();
         StartCoroutine(ManageOxygen());
-
-        
     }
+
+    void InitializeVignettes()
+    {
+        // Set vignette in all profiles to black
+        if (allProfiles != null)
+        {
+            foreach (var profile in allProfiles)
+            {
+                if (profile != null && profile.TryGet(out Vignette vignette))
+                {
+                    vignette.color.value = Color.black;
+                }
+            }
+        }
+    }
+    
     private void Update()
     {
         //Debug.Log(transform.position.y);
@@ -69,21 +84,32 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-
     IEnumerator DamageFeedback()
     {
         if (postProcessVolume != null && postProcessVolume.profile != null)
         {
-            postProcessVolume.profile.TryGet<Vignette>(out vignette);
+            // Get vignette from CURRENT active profile
+            if (postProcessVolume.profile.TryGet(out Vignette vignette))
+            {
+                // Flash red
+                vignette.color.value = Color.red;
+               
+                
+                yield return new WaitForSeconds(0.2f);
+                
+                // Reset to black
+                vignette.color.value = Color.black;
+            }
         }
-        vignette.color.value = Color.red;
-        yield return new WaitForSeconds(1f);
-        vignette.color.value = Color.black;
+        else
+        {
+            yield return new WaitForSeconds(1f);
+        }
     }
+    
     void Die()
     {
         Debug.Log("Player died");
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
     }
 }

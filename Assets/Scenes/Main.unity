@@ -7512,7 +7512,11 @@ MonoBehaviour:
   oxygenDepletionInterval: 1
   oxygenReplenishmentRate: 4
   depthThreshold: -2.55
-  postProcessVolume: {fileID: 832575518}
+  postProcessVolume: {fileID: 927614679}
+  allProfiles:
+  - {fileID: 11400000, guid: dd2602508cfeb1f4cbb881e8b2d5adcd, type: 2}
+  - {fileID: 11400000, guid: 6f11742840f4ddb40b3beb1ed4b8bfb5, type: 2}
+  - {fileID: 11400000, guid: 30a9d9bf154bf954584598251930b733, type: 2}
 --- !u!4 &95399470581797740
 Transform:
   m_ObjectHideFlags: 0
