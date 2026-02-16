@@ -11,11 +11,13 @@ public class PlayerMovement : MonoBehaviour
     private Camera playerCamera;
     private float swimSpeed = 75f;
     private float walkSpeed = 5f;
-    private float verticalSpeed = 30f;
+    private float verticalSpeed;
     private float maxSpeed = 15f;
     private float swimDrift = 0.1f;
+    private float stateSwitchHeight = -2.5f;
 
     private Vector3 currentVelocity = Vector3.zero;
+    private float currentVerticalVelocity = 0f;
     private float decelerationTime = 0.5f;
     private float cameraXRotation = 0f;
     [SerializeField] private float minLookAngle = -90f;
@@ -38,40 +40,10 @@ public class PlayerMovement : MonoBehaviour
         //Vertical();
     }
 
-    //void Vertical()
-    //{
-    //    // Stop if player is using Move action
-    //    if (InputSystem.actions["Move"].ReadValue<Vector2>().magnitude > 0.1f)
-    //    {
-    //        currentVerticalVelocity = 0f;
-    //        return;
-    //    }
-
-    //    float targetVerticalVelocity = 0f;
-        
-    //    // Check if Jump is pressed (ascend)
-    //    if (InputSystem.actions["Jump"].IsPressed())
-    //    {
-    //        targetVerticalVelocity = verticalSpeed;
-    //    }
-        
-    //    // Check if Crouch is pressed (descend)
-    //    if (InputSystem.actions["Crouch"].IsPressed())
-    //    {
-    //        targetVerticalVelocity = -verticalSpeed;
-    //    }
-        
-    //    // Lerp vertical velocity
-    //    float lerpSpeed = Mathf.Abs(targetVerticalVelocity) > 0.1f ? swimDrift : 1f / decelerationTime;
-    //    currentVerticalVelocity = Mathf.Lerp(currentVerticalVelocity, targetVerticalVelocity, Time.deltaTime * lerpSpeed);
-        
-    //    Vector3 verticalMove = transform.up * currentVerticalVelocity * Time.deltaTime;
-    //    controller.Move(verticalMove);
-    //}
     
     void MovementStyle()
         {
-        if (transform.position.y > -2.5f)
+        if (transform.position.y > stateSwitchHeight)
         {
             Walk();
         }
@@ -85,14 +57,15 @@ public class PlayerMovement : MonoBehaviour
     {    
         Vector2 input = InputSystem.actions["Move"].ReadValue<Vector2>();
         Vector3 move = (transform.right * input.x + transform.forward * input.y) *walkSpeed ;
-            verticalSpeed = -9f;
-            move.y = verticalSpeed;
+        verticalSpeed = -9f;
+        move.y = verticalSpeed;
+
         animator.SetFloat("Forward", input.y);
         animator.SetFloat("Strafe", input.x);
         controller.Move(move * Time.deltaTime);
 
         // set ani bool for walking
-        if (InputSystem.actions["Move"].IsPressed() && transform.position.y > -2.5f)
+        if (InputSystem.actions["Move"].IsPressed() && transform.position.y > stateSwitchHeight)
         {
             animator.SetBool("isWalking", true);
         }
@@ -100,21 +73,17 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetBool("isWalking", false);
         }
-
-
-
     }
     void Swim()
     {
         Vector2 input = InputSystem.actions["Move"].ReadValue<Vector2>();
         Vector3 targetVelocity = new Vector3(0,0,0);
+       
 
         if (input.magnitude > 0.1f)
         {
-            // Player is pressing movement keys - move in that direction
-            targetVelocity = (playerCamera.transform.right * input.x + playerCamera.transform.forward * input.y) * swimSpeed;
 
-       
+            targetVelocity = (playerCamera.transform.right * input.x + playerCamera.transform.forward * input.y) * swimSpeed;
         }
     
         else
@@ -122,27 +91,32 @@ public class PlayerMovement : MonoBehaviour
             targetVelocity = Vector3.zero;
         }
 
-        // lerp between the current velo and the targeted
+    
         float lerpSpeed = input.magnitude > 0.1f ? swimDrift : 1f / decelerationTime;
         currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, Time.deltaTime * lerpSpeed);
-        // set max speed
         currentVelocity = Vector3.ClampMagnitude(currentVelocity, maxSpeed);
-
         controller.Move(currentVelocity * Time.deltaTime);
-        if(InputSystem.actions["Jump"].IsPressed())
+
+     // vertical
+        float targetVerticalVelocity = 0f;
+        verticalSpeed = 50f;
+        if (InputSystem.actions["Jump"].IsPressed())
         {
-            controller.Move(Vector3.up * -verticalSpeed * Time.deltaTime);
+            targetVerticalVelocity = verticalSpeed;
         }
         else if(InputSystem.actions["Crouch"].IsPressed())
         {
-            controller.Move(Vector3.down * -verticalSpeed * Time.deltaTime);
+            targetVerticalVelocity = -verticalSpeed;
         }
+        float verticalLerpSpeed = Mathf.Abs(targetVerticalVelocity) > 0.1f ? swimDrift : 1f / decelerationTime;
+        currentVerticalVelocity = Mathf.Lerp(currentVerticalVelocity, targetVerticalVelocity, Time.deltaTime * verticalLerpSpeed);
+        controller.Move(Vector3.up * currentVerticalVelocity * Time.deltaTime);
       
 
-        if (transform.position.y <= -2.5f)
+        if (transform.position.y <= -stateSwitchHeight)
         {
             animator.SetBool("inWater", true);
-            if (InputSystem.actions["Move"].IsPressed() && transform.position.y <= -2.5f)
+            if (InputSystem.actions["Move"].IsPressed() && transform.position.y <= stateSwitchHeight)
             {
                 animator.SetBool("isSwimming", true);
             }
