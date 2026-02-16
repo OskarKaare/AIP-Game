@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -15,7 +16,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private float depthThreshold = -2.55f;
 
     [SerializeField] private Volume postProcessVolume;
-    [SerializeField] private VolumeProfile[] allProfiles; // Add all your profiles here
+    [SerializeField] private VolumeProfile[] allProfiles;
+    public TextMeshProUGUI healthText;
+    public TextMeshProUGUI oxygenText;
+    public TextMeshProUGUI depthText;
 
     void Start()
     {
@@ -38,10 +42,20 @@ public class PlayerStats : MonoBehaviour
             }
         }
     }
-    
+
     private void Update()
     {
-        //Debug.Log(transform.position.y);
+        healthText.text = $" {health} / 100";
+        oxygenText.text = $"{currentOxygen} / {maxOxygen}";
+        if (transform.position.y < depthThreshold)
+        {
+            depthText.text = $"Depth: {Mathf.RoundToInt(-transform.position.y)}m";
+        }
+        else
+        {
+            depthText.text = "Depth: 0m";
+        }
+
     }
 
     IEnumerator ManageOxygen()
@@ -60,18 +74,24 @@ public class PlayerStats : MonoBehaviour
                     TakeDamage(10f);
                 }
             }
-            else 
+            else
             {
-                yield return new WaitForSeconds (0.25f); 
+                yield return new WaitForSeconds(0.25f);
                 if (currentOxygen < maxOxygen)
                     currentOxygen += oxygenReplenishmentRate;
-                    if (currentOxygen > maxOxygen)
-                        currentOxygen = maxOxygen;
+                if (currentOxygen > maxOxygen)
+                    currentOxygen = maxOxygen;
 
             }
         }
     }
-
+    
+    public void BubbleRefil(int amount)
+    {
+        currentOxygen += amount;
+        if (currentOxygen > maxOxygen)
+            currentOxygen = maxOxygen;
+    }
     void TakeDamage(float damage)
     {
         health -= damage;
@@ -101,7 +121,7 @@ public class PlayerStats : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
     }
-    
+
     void Die()
     {
         Debug.Log("Player died");
