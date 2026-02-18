@@ -6,38 +6,34 @@ using UnityEngine.InputSystem;
 public class Interactor : MonoBehaviour
 {
     private Camera cam;
+
     private float interactDistance = 3f;
+    private float interactCooldown = 1f;
+    private float delayTimer = 0f;
 
     private void Start()
     {
         cam = GetComponentInChildren<Camera>();
-       // onInteract.Invoke();
-        
     }
 
     private void Update()
     {
-        if (Keyboard.current.eKey.wasPressedThisFrame)
+        delayTimer += Time.deltaTime;
+        if (Keyboard.current.eKey.wasPressedThisFrame && interactCooldown < delayTimer)
         {
+            delayTimer = 0f;
             Interact();
         }
-
     }
     public void Interact()
     {
-        Debug.Log("Interact button pressed!");
+        Debug.Log("Interacting");
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out var hit, interactDistance))
         {
-            Debug.Log($"Hit: {hit.collider.name}");
-            if (hit.collider.CompareTag("fish"))
-            {
-                Debug.Log("Interacted with a fish!");
-
-            }
-            else if (hit.collider.CompareTag("item"))
-            {
-                Debug.Log("Interacted with an item!");
-            }
+            //if (hit.collider.TryGetComponent(out IInteractable interactable))
+            //{
+            //    interactable.Interact();
+            //}
         }
     }
 }
