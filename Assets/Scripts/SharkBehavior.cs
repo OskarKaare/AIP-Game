@@ -3,14 +3,16 @@ using UnityEngine;
 
 public class SharkBehavior : MonoBehaviour
 {
-    private SphereCollider collider;
+    private SphereCollider seekCollider;
     private int chaseTimer = 10;
     public Transform player;
+    private Animator animator;
 
     private float speed = 4f;
     void Start()
     {
-        collider = GetComponent<SphereCollider>();
+        animator = GetComponent<Animator>();
+        seekCollider = GetComponent<SphereCollider>();
         StartCoroutine(Move());
     }
 
