@@ -15,8 +15,8 @@ public class SharkFSM : FSM
 
     public SharkState curState = SharkState.Patrol;
 
-    private float curSpeed = 5f;
-    private float curRotSpeed = 2f;
+    private float curSpeed = 6.7f;
+    private float curRotSpeed = 5f;
     private bool isDead = false;
     private int health = 100;
     private SphereCollider seekCollider;
@@ -24,7 +24,7 @@ public class SharkFSM : FSM
     private Transform playerTransform;
     private Vector3 destPos;
     private Rigidbody rb;
-    public float patrollingRadius = 20f;
+    public float patrollingRadius = 2f;
     public float attackRange = 5f;
     public float PlayerNearRange = 15f;
 
@@ -84,25 +84,25 @@ public class SharkFSM : FSM
 
     protected void UpdatePatrolState()
     {
-        // Find another random patrol point if the current point is reached
-        if (patrolPoints != null && patrolPoints.Length > 0 && Vector3.Distance(transform.position, destPos) <= patrollingRadius)
+       
+        if (Vector3.Distance(transform.position, destPos) <= patrollingRadius)
         {
-            Debug.Log("Patrol point reached, finding next");
+            print("Point reached, get next point");
             FindNextPoint();
         }
-        // Check the distance with player tank
-        // When the distance is near, transition to chase state (only if playerTransform exists)
-        else if (playerTransform != null && Vector3.Distance(transform.position, playerTransform.position) <= PlayerNearRange)
+     
+        else if (Vector3.Distance(transform.position, playerTransform.position) <= PlayerNearRange)
         {
-            print("Player in range, switching to chase state");
+            print("player close, change to chase state");
             curState = SharkState.Chase;
         }
 
-        // Rotation
-        Vector3 currentDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
-        Quaternion targetRotation = Quaternion.LookRotation(-currentDirection);
+        //Rotate to the target point
+        Vector3 dir = destPos - transform.position;
+        Quaternion targetRotation = Quaternion.LookRotation(dir);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * curRotSpeed);
 
+        //Go Forward
         transform.Translate(Vector3.forward * Time.deltaTime * curSpeed);
     }
 
