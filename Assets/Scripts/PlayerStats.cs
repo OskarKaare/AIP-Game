@@ -67,7 +67,7 @@ public class PlayerStats : MonoBehaviour
                 // Deplete oxygen
                 yield return new WaitForSeconds(oxygenDepletionInterval);
                 currentOxygen -= oxygenDepletionRate;
-                Debug.Log($"Oxygen: {currentOxygen}/{maxOxygen}");
+                //Debug.Log($"Oxygen: {currentOxygen}/{maxOxygen}");
 
                 if (currentOxygen <= 0)
                 {
@@ -92,7 +92,7 @@ public class PlayerStats : MonoBehaviour
         if (currentOxygen > maxOxygen)
             currentOxygen = maxOxygen;
     }
-    void TakeDamage(float damage)
+    public void TakeDamage(float damage)
     {
         health -= damage;
         Debug.Log($"Player took {damage} damage. Current health: {health}");

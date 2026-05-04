@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Timers;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,8 +10,7 @@ public class SharkFSM : FSM
     {
         Patrol,
         Chase,
-        Attack,
-        Flee,
+        Cooldown,
         Dead,
     }
 
@@ -20,7 +20,7 @@ public class SharkFSM : FSM
     private float curRotSpeed = 5f;
     //private bool isDead = false;
     private int health = 100;
-    private SphereCollider seekCollider;
+    //private SphereCollider seekCollider;
     public GameObject[] patrolPoints;
     private Transform playerTransform;
     private Vector3 destPos;
@@ -28,6 +28,8 @@ public class SharkFSM : FSM
     public float patrollingRadius = 2f;
     public float chaseRange = 100f;
     public float attackRange = 10f;
+    private Animator animator;
+    private PlayerStats playerStats;
 
 
 
@@ -45,8 +47,9 @@ public class SharkFSM : FSM
         }
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        playerStats = playerObj.GetComponent<PlayerStats>();
         playerTransform = playerObj.transform;
-
+        animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
     }
 
@@ -60,12 +63,9 @@ public class SharkFSM : FSM
             case SharkState.Chase:
                 UpdateChaseState();
                 break;
-                //case SharkState.Attack:
-                //    UpdateAttackState();
-                //    break;
-                //case SharkState.Flee:
-                //    UpdateDeadState();
-                //    break;
+            case SharkState.Cooldown:
+                 UpdateCooldownState();
+                 break;
                 //case SharkState.Dead:
                 //    UpdateDeadState();
                 //    break;
@@ -80,14 +80,14 @@ public class SharkFSM : FSM
     {
         curSpeed = 6.7f;
         Move();
-        
+
         if (Vector3.Distance(transform.position, destPos) <= patrollingRadius)
         {
             print("Point reached, get next point");
             FindNextPoint();
         }
 
-        else if (Vector3.Distance(transform.position, playerTransform.position) <= chaseRange && playerTransform.position.y <0)
+        else if (Vector3.Distance(transform.position, playerTransform.position) <= chaseRange && playerTransform.position.y < 0)
         {
             print("player close, change to chase state");
             curState = SharkState.Chase;
@@ -96,22 +96,51 @@ public class SharkFSM : FSM
 
     protected void UpdateChaseState()
     {
-        curSpeed = 12f;
-        destPos = playerTransform.position;
-        Move();
-        if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange)
+        if (playerTransform.position.y < -2.3f)
         {
-            print("player in attack range, change to attack state");
-            curState = SharkState.Attack;
+            animator.SetBool("Chasing", true);
+            curSpeed = 15f;
+            destPos = playerTransform.position;
+            Move();
+            if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange)
+            {
+                print("player in attack range, attack and change to cooldown state");
+                playerStats.TakeDamage(45f);
+                curState = SharkState.Cooldown;
+                StartCoroutine(CooldownTimer());
+            }
+            else if (Vector3.Distance(transform.position, playerTransform.position) >= chaseRange)
+            {
+                print("player escaped, change to patrol state");
+                FindNextPoint();
+                animator.SetBool("Chasing", false);
+                curState = SharkState.Patrol;
+            }
         }
-        else if (Vector3.Distance(transform.position, playerTransform.position) >= chaseRange)
+        else
         {
-            print("player escaped, change to patrol state");
+            print("player is on land, change to patrol state");
             FindNextPoint();
+            animator.SetBool("Chasing", false);
             curState = SharkState.Patrol;
         }
     }
 
+    protected void UpdateCooldownState()
+    {
+        animator.SetBool("Chasing", false);
+        curSpeed = 4f;
+        Vector3 recoverPoint = transform.forward * -20f;
+        destPos = recoverPoint;
+        Move();
+    }
+
+    IEnumerator CooldownTimer()
+    {
+        yield return new WaitForSeconds(5f);
+        print("Cooldown over, change to patrol state");
+        curState = SharkState.Patrol;
+    }
     protected void FindNextPoint()
     {
         if (patrolPoints == null || patrolPoints.Length == 0)

@@ -125,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("isSwimming", false);
             }
         }
-        else
+        if (transform.position.y > stateSwitchHeight)
         {
             animator.SetBool("inWater", false);
 
