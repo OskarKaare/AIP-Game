@@ -71,7 +71,7 @@ public class PlayerStats : MonoBehaviour
 
                 if (currentOxygen <= 0)
                 {
-                    TakeDamage(10f);
+                    TakeDamage(10);
                 }
             }
             else
@@ -92,7 +92,7 @@ public class PlayerStats : MonoBehaviour
         if (currentOxygen > maxOxygen)
             currentOxygen = maxOxygen;
     }
-    public void TakeDamage(float damage)
+    public void TakeDamage(int damage)
     {
         health -= damage;
         Debug.Log($"Player took {damage} damage. Current health: {health}");

@@ -30,7 +30,7 @@ public class SharkFSM : FSM
     public float attackRange = 10f;
     private Animator animator;
     private PlayerStats playerStats;
-
+    private int cooldownValue = 7;
 
 
     protected override void Initialize()
@@ -50,7 +50,7 @@ public class SharkFSM : FSM
         playerStats = playerObj.GetComponent<PlayerStats>();
         playerTransform = playerObj.transform;
         animator = GetComponentInChildren<Animator>();
-        rb = GetComponent<Rigidbody>();
+   
     }
 
     protected override void FSMUpdate()
@@ -105,7 +105,7 @@ public class SharkFSM : FSM
             if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange)
             {
                 print("player in attack range, attack and change to cooldown state");
-                playerStats.TakeDamage(45f);
+                playerStats.TakeDamage(45);
                 curState = SharkState.Cooldown;
                 StartCoroutine(CooldownTimer());
             }
@@ -137,7 +137,7 @@ public class SharkFSM : FSM
 
     IEnumerator CooldownTimer()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(cooldownValue);
         print("Cooldown over, change to patrol state");
         curState = SharkState.Patrol;
     }
@@ -159,5 +159,11 @@ public class SharkFSM : FSM
         Quaternion targetRotation = Quaternion.LookRotation(dir);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * curRotSpeed);
         transform.Translate(Vector3.forward * Time.deltaTime * curSpeed);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+       
     }
 }
