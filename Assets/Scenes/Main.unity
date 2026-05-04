@@ -2290,6 +2290,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1082984568}
   m_CullTransparentMesh: 1
+--- !u!1 &1151515273
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1151515275}
+  - component: {fileID: 1151515274}
+  m_Layer: 0
+  m_Name: Shark
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1151515274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1151515273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a74db8eedaad6b84f837d48ba1b48a3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SharkFSM
+  curState: 0
+  patrolPoints: []
+  patrollingRadius: 2
+  chaseRange: 100
+  attackRange: 10
+--- !u!4 &1151515275
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1151515273}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -168.4, y: 14.5, z: -65.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 543450652273450327}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1161630091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7879,7 +7929,7 @@ Transform:
   m_GameObject: {fileID: 2144495991}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -174.6, y: 6.302, z: -170.29}
+  m_LocalPosition: {x: -174.6, y: 10.8, z: -179.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8208,16 +8258,16 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132148332939245}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -167.27931, y: 9.26, z: -58.78}
+  m_LocalRotation: {x: -0.71566224, y: -0, z: -0, w: 0.69844663}
+  m_LocalPosition: {x: 0, y: 30.1, z: 42.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5653519915605641799}
   - {fileID: 8160277321349538112}
   - {fileID: 1438673442473377429}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Father: {fileID: 1151515275}
+  m_LocalEulerAnglesHint: {x: -91.395, y: 0, z: 0}
 --- !u!4 &543450652327534438
 Transform:
   m_ObjectHideFlags: 0
@@ -8443,7 +8493,6 @@ GameObject:
   - component: {fileID: 543450652273450327}
   - component: {fileID: 5866666020584507181}
   - component: {fileID: 5866666020584507182}
-  - component: {fileID: 5866666020584507183}
   m_Layer: 0
   m_Name: Sharkv1
   m_TagString: Untagged
@@ -11097,27 +11146,10 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 60
   m_Center: {x: 0, y: 37.2, z: -29.5}
---- !u!114 &5866666020584507183
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132148332939245}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a74db8eedaad6b84f837d48ba1b48a3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  curState: 0
-  patrolPoints: []
-  patrollingRadius: 20
-  attackRange: 5
-  PlayerNearRange: 15
 --- !u!1 &5914173765362482674
 GameObject:
   m_ObjectHideFlags: 0
@@ -12441,14 +12473,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6026860428115366560}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7069834, z: 0.7072302, w: 0}
-  m_LocalPosition: {x: 1.4959328e-16, y: -2.73, z: 4.82}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 39.1, z: -32.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4404546752340483099}
   m_Father: {fileID: 543450652273450327}
-  m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 180}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8173599493170743097
 GameObject:
   m_ObjectHideFlags: 0
@@ -13116,5 +13148,5 @@ SceneRoots:
   - {fileID: 504380065}
   - {fileID: 2144495997}
   - {fileID: 1312990242}
-  - {fileID: 543450652273450327}
   - {fileID: 781094820}
+  - {fileID: 1151515275}

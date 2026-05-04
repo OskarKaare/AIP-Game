@@ -1,4 +1,5 @@
 using System.Timers;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
 
@@ -15,9 +16,9 @@ public class SharkFSM : FSM
 
     public SharkState curState = SharkState.Patrol;
 
-    private float curSpeed = 6.7f;
+    private float curSpeed;
     private float curRotSpeed = 5f;
-    private bool isDead = false;
+    //private bool isDead = false;
     private int health = 100;
     private SphereCollider seekCollider;
     public GameObject[] patrolPoints;
@@ -25,8 +26,9 @@ public class SharkFSM : FSM
     private Vector3 destPos;
     private Rigidbody rb;
     public float patrollingRadius = 2f;
-    public float attackRange = 5f;
-    public float PlayerNearRange = 15f;
+    public float chaseRange = 100f;
+    public float attackRange = 10f;
+
 
 
     protected override void Initialize()
@@ -42,16 +44,8 @@ public class SharkFSM : FSM
             Debug.LogWarning("No patrol points found");
         }
 
-        GameObject objPlayer = GameObject.FindGameObjectWithTag("Player");
-        if (objPlayer != null)
-        {
-            playerTransform = objPlayer.transform;
-        }
-        else
-        {
-            playerTransform = null;
-            Debug.LogWarning("No player found");
-        }
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        playerTransform = playerObj.transform;
 
         rb = GetComponent<Rigidbody>();
     }
@@ -63,18 +57,18 @@ public class SharkFSM : FSM
             case SharkState.Patrol:
                 UpdatePatrolState();
                 break;
-            //case SharkState.Chase:
-            //    UpdateChaseState();
-            //    break;
-            //case SharkState.Attack:
-            //    UpdateAttackState();
-            //    break;
-            //case SharkState.Flee:
-            //    UpdateDeadState();
-            //    break;
-            //case SharkState.Dead:
-            //    UpdateDeadState();
-            //    break;
+            case SharkState.Chase:
+                UpdateChaseState();
+                break;
+                //case SharkState.Attack:
+                //    UpdateAttackState();
+                //    break;
+                //case SharkState.Flee:
+                //    UpdateDeadState();
+                //    break;
+                //case SharkState.Dead:
+                //    UpdateDeadState();
+                //    break;
         }
 
         if (health <= 0)
@@ -84,26 +78,38 @@ public class SharkFSM : FSM
 
     protected void UpdatePatrolState()
     {
-       
+        curSpeed = 6.7f;
+        Move();
+        
         if (Vector3.Distance(transform.position, destPos) <= patrollingRadius)
         {
             print("Point reached, get next point");
             FindNextPoint();
         }
-     
-        else if (Vector3.Distance(transform.position, playerTransform.position) <= PlayerNearRange)
+
+        else if (Vector3.Distance(transform.position, playerTransform.position) <= chaseRange && playerTransform.position.y <0)
         {
             print("player close, change to chase state");
             curState = SharkState.Chase;
         }
+    }
 
-        //Rotate to the target point
-        Vector3 dir = destPos - transform.position;
-        Quaternion targetRotation = Quaternion.LookRotation(dir);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * curRotSpeed);
-
-        //Go Forward
-        transform.Translate(Vector3.forward * Time.deltaTime * curSpeed);
+    protected void UpdateChaseState()
+    {
+        curSpeed = 12f;
+        destPos = playerTransform.position;
+        Move();
+        if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange)
+        {
+            print("player in attack range, change to attack state");
+            curState = SharkState.Attack;
+        }
+        else if (Vector3.Distance(transform.position, playerTransform.position) >= chaseRange)
+        {
+            print("player escaped, change to patrol state");
+            FindNextPoint();
+            curState = SharkState.Patrol;
+        }
     }
 
     protected void FindNextPoint()
@@ -113,9 +119,16 @@ public class SharkFSM : FSM
             Debug.LogWarning("no patrol points found");
             return;
         }
-
         int randomIndex = Random.Range(0, patrolPoints.Length);
         Vector3 offsetVector = new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10));
         destPos = patrolPoints[randomIndex].transform.position + offsetVector;
+    }
+
+    private void Move()
+    {
+        Vector3 dir = destPos - transform.position;
+        Quaternion targetRotation = Quaternion.LookRotation(dir);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * curRotSpeed);
+        transform.Translate(Vector3.forward * Time.deltaTime * curSpeed);
     }
 }
