@@ -128,6 +128,7 @@ public class SharkFSM : FSM
 
     protected void UpdateCooldownState()
     {
+        // this sucks.
         animator.SetBool("Chasing", false);
         curSpeed = 4f;
         Vector3 recoverPoint = transform.forward * -20f;
