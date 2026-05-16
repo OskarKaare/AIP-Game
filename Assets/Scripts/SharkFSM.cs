@@ -19,6 +19,7 @@ public class SharkFSM : FSM
     private float curSpeed;
     private float curRotSpeed = 5f;
     //private bool isDead = false;
+    private bool deadLimit = false;
     private int health = 100;
     //private SphereCollider seekCollider;
     public GameObject[] patrolPoints;
@@ -66,9 +67,11 @@ public class SharkFSM : FSM
             case SharkState.Cooldown:
                  UpdateCooldownState();
                  break;
-                //case SharkState.Dead:
-                //    UpdateDeadState();
-                //    break;
+            case SharkState.Dead:
+                animator.SetBool("Dead", true);
+               if (!deadLimit)
+                    StartCoroutine(DeathRemove());
+                break;
         }
 
         if (health <= 0)
@@ -166,5 +169,13 @@ public class SharkFSM : FSM
     {
         health -= damage;
        
+    }
+
+    IEnumerator DeathRemove()
+    {
+        deadLimit = true;
+        Debug.Log("Shark is dead, start death timer");
+        yield return new WaitForSeconds(9.98f);
+        Destroy(gameObject);
     }
 }
