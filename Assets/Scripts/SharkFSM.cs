@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Timers;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -22,7 +23,7 @@ public class SharkFSM : FSM
     private bool deadLimit = false;
     private int health = 100;
     //private SphereCollider seekCollider;
-    public GameObject[] patrolPoints;
+    public List<Vector3> patrolPoints;
     private Transform playerTransform;
     private Vector3 destPos;
     private Rigidbody rb;
@@ -37,8 +38,17 @@ public class SharkFSM : FSM
     protected override void Initialize()
     {
         // Get and set patrol points
-        patrolPoints = GameObject.FindGameObjectsWithTag("PatrolPoint");
-        if (patrolPoints != null && patrolPoints.Length > 0)
+        patrolPoints = new List<Vector3>();
+        foreach (Transform child in transform)
+        {
+            if (child.CompareTag("PatrolPoint"))
+            {
+                patrolPoints.Add(child.position);
+                //Debug.Log ("Patrol point added: " + child.gameObject.name);
+            
+            }
+        }
+        if (patrolPoints != null && patrolPoints.Count > 0)
         {
             FindNextPoint();
         }
@@ -53,7 +63,17 @@ public class SharkFSM : FSM
         animator = GetComponentInChildren<Animator>();
    
     }
-
+    protected void FindNextPoint()
+    {
+        if (patrolPoints == null || patrolPoints.Count == 0)
+        {
+            Debug.LogWarning("no patrol points found");
+            return;
+        }
+        int randomIndex = Random.Range(0, patrolPoints.Count);
+        Vector3 offsetVector = new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10));
+        destPos = patrolPoints[randomIndex] + offsetVector;
+    }
     protected override void FSMUpdate()
     {
         switch (curState)
@@ -145,17 +165,7 @@ public class SharkFSM : FSM
         print("Cooldown over, change to patrol state");
         curState = SharkState.Patrol;
     }
-    protected void FindNextPoint()
-    {
-        if (patrolPoints == null || patrolPoints.Length == 0)
-        {
-            Debug.LogWarning("no patrol points found");
-            return;
-        }
-        int randomIndex = Random.Range(0, patrolPoints.Length);
-        Vector3 offsetVector = new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10));
-        destPos = patrolPoints[randomIndex].transform.position + offsetVector;
-    }
+  
 
     private void Move()
     {

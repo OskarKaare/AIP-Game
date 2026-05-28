@@ -18,13 +18,13 @@ public class FishFlockController : MonoBehaviour
     void Update()
     {
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        transform.rotation = Quaternion.Slerp(transform.rotation,
-        Quaternion.LookRotation(nextMovementPoint - transform.position), 1.0f * Time.deltaTime);
-        if (Vector3.Distance(nextMovementPoint, transform.position) <= targetReachedRadius)
-            CalculateNextMovementPoint();
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(nextMovementPoint - transform.position), 1.0f * Time.deltaTime);
+
+     
     }
     void CalculateNextMovementPoint()
     {
+
         float posX = Random.Range(-bound.x, bound.x);
         float posY = Random.Range(-bound.y, bound.y);
         float posZ = Random.Range(-bound.z, bound.z);
