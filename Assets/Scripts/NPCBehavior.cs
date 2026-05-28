@@ -3,7 +3,7 @@ using UnityEngine;
 public class NPCBehavior : MonoBehaviour
 {
     public Canvas questText;
-    public Transform playerTransform;
+    private Transform playerTransform;
     private float turnSpeed = 5f;
 
     private void Start()

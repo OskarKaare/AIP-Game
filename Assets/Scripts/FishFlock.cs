@@ -5,23 +5,25 @@ public class FishFlock : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
-    public float minSpeed = 20.0f;
-    public float turnSpeed = 20.0f;
-    public float randomFreq = 20.0f;
+    public float minSpeed = 20f;
+    public float turnSpeed = 20f;
+    public float randomFreq = 20f;
 
-    public float randomForce = 20.0f;
+    public float randomForce = 20f;
     //alignment variables
-    public float toOriginForce = 50.0f;
-    public float toOriginRange = 100.0f;
-    public float gravity = 2.0f;
+    public float toOriginForce = 50f;
+    public float toOriginRange = 100f;
+    public float gravity = 2f;
 
     //seperation variables
-    public float avoidanceRadius = 50.0f;
-    public float avoidanceForce = 20.0f;
+    public float avoidanceRadius = 50f;
+    public float avoidanceForce = 20f;
 
     //cohesion variables
-    public float followVelocity = 4.0f;
-    public float followRadius = 40.0f;
+    public float followVelocity = 4f;
+    public float followRadius = 40f;
+
+
 
     //these variables control the movement of the boid
     private Transform origin;
@@ -33,10 +35,11 @@ public class FishFlock : MonoBehaviour
     private FishFlock[] otherFlocks;
     private Transform transformComponent;
     private float randomFreqInterval;
+    public float waterlevel = -1f;
 
     void Start()
     {
-        randomFreqInterval = 1.0f / randomFreq;
+        randomFreqInterval = 1f / randomFreq;
         // Assign the parent as origin
         origin = transform.parent;
         // Flock transform
@@ -92,39 +95,41 @@ public class FishFlock : MonoBehaviour
             {
                 Vector3 otherPosition = boidTransform.position;
 
-                // Average position to calculate cohesion
-                avgPosition += otherPosition;
-                count++;
-
-                //Directional vector from other flock to this flock
-                forceV = myPosition - otherPosition;
-
-                //Magnitude of that directional
-                //vector(Length)
-                float directionMagnitude = forceV.magnitude;
-                float forceMagnitude = 0.0f;
-                if (directionMagnitude < followRadius)
+                // Only consider other boids that are at or below Y = 0
+                if (otherPosition.y <= 0f)
                 {
-                    if (directionMagnitude < avoidanceRadius)
+                    // Average position to calculate cohesion
+                    avgPosition += otherPosition;
+                    count++;
+
+                    //Directional vector from other flock to this flock
+                    forceV = myPosition - otherPosition;
+
+                    //Magnitude of that directional
+                    //vector(Length)
+                    float directionMagnitude = forceV.magnitude;
+                    float forceMagnitude = 0f;
+                    if (directionMagnitude < followRadius)
                     {
-                        forceMagnitude = 1.0f - (directionMagnitude / avoidanceRadius);
-                        if (directionMagnitude > 0)
-                            avgVelocity += (forceV / directionMagnitude) * forceMagnitude * avoidanceForce;
-                        // forceV / directionMagnitude = normalized directon AWAY
+                        if (directionMagnitude < avoidanceRadius)
+                        {
+                            forceMagnitude = 1f - (directionMagnitude / avoidanceRadius);
+                            if (directionMagnitude > 0)
+                                avgVelocity += (forceV / directionMagnitude) * forceMagnitude * avoidanceForce;
+                            // forceV / directionMagnitude = normalized directon AWAY
+                        }
+                        forceMagnitude = directionMagnitude / followRadius;
+                        FishFlock tempOtherBoid = otherFlocks[i];
+                        avgVelocity += followVelocity * forceMagnitude * tempOtherBoid.normalizedVelocity;
                     }
-                    forceMagnitude = directionMagnitude / followRadius;
-                    FishFlock tempOtherBoid = otherFlocks[i];
-                    avgVelocity += followVelocity * forceMagnitude * tempOtherBoid.normalizedVelocity;
                 }
             }
         }
         if (count > 0)
         {
-            //Calculate the average flock
-            //velocity(Alignment)
+            //Calculate the average flock velocity(Alignment)
             avgVelocity /= count;
-            //Calculate Center value of the
-            //flock(Cohesion)
+            //Calculate Center value of the flock(Cohesion)
             toAvg = (avgPosition / count) - myPosition;
         }
         else
@@ -132,27 +137,49 @@ public class FishFlock : MonoBehaviour
             toAvg = Vector3.zero;
         }
         //Directional Vector to the leader
-        forceV = origin.position - myPosition;
-        float leaderDirectionMagnitude = forceV.magnitude;
+        Vector3 leaderForceV = origin.position - myPosition;
+        float leaderDirectionMagnitude = leaderForceV.magnitude;
         float leaderForceMagnitude = leaderDirectionMagnitude / toOriginRange;
         //Calculate the velocity of the flock to the leader
         if (leaderDirectionMagnitude > 0)
-            originPush = leaderForceMagnitude * toOriginForce * (forceV / leaderDirectionMagnitude);
+            originPush = leaderForceMagnitude * toOriginForce * (leaderForceV / leaderDirectionMagnitude);
         if (speed < minSpeed && speed > 0)
         {
             velocity = (velocity / speed) * minSpeed;
         }
+
+        // final velocity calculations
         Vector3 wantedVel = velocity;
-        //Calculate final velocity
         wantedVel -= wantedVel * Time.deltaTime;
         wantedVel += randomPush * Time.deltaTime;
         wantedVel += originPush * Time.deltaTime;
         wantedVel += avgVelocity * Time.deltaTime;
-        wantedVel += gravity * Time.deltaTime * toAvg.normalized;
+
+        // gravity limitations, we dont want the fish to be able to "fly"
+        Vector3 gravityPush = gravity * Time.deltaTime * toAvg.normalized;
+        if (myPosition.y >= waterlevel && gravityPush.y > waterlevel)
+        {
+            gravityPush.y = 0f;
+        }
+        wantedVel += gravityPush;
+
+        // Prevent the fish from gaining velocity that would push it above water level
+        float projectedNextY = transformComponent.position.y + wantedVel.y * Time.deltaTime;
+        if (projectedNextY > waterlevel)
+        {
+            wantedVel.y = 0f;
+        }
+
         velocity = Vector3.RotateTowards(velocity, wantedVel, turnSpeed * Time.deltaTime, 100.00f);
+        // Ensure final velocity doesn't push above Y = 0
+        float projectedFinalNextY = transformComponent.position.y + velocity.y * Time.deltaTime;
+        if (projectedFinalNextY > waterlevel)
+        {
+            velocity.y = 0f;
+        }
+
         transformComponent.rotation = Quaternion.LookRotation(velocity);
-        //Move the flock based on the calculated
-        //velocity
+        //Move the flock based on the calculated velocity
         transformComponent.Translate(velocity * Time.deltaTime, Space.World);
         normalizedVelocity = velocity.normalized;
     }
