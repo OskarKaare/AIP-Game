@@ -10,6 +10,7 @@ public class Interactor : MonoBehaviour
     private float interactDistance = 3f;
     private float interactCooldown = 1f;
     private float delayTimer = 0f;
+    public bool dogInBag;
 
     private void Start()
     {
@@ -22,18 +23,20 @@ public class Interactor : MonoBehaviour
         if (Keyboard.current.eKey.wasPressedThisFrame && interactCooldown < delayTimer)
         {
             delayTimer = 0f;
-            Interact();
+            TryoToInteract();
         }
     }
-    public void Interact()
+    public void TryoToInteract()
     {
+        delayTimer = 2f;
         Debug.Log("Interacting");
-        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out var hit, interactDistance))
-        {
-            //if (hit.collider.TryGetComponent(out IInteractable interactable))
-            //{
-            //    interactable.Interact();
-            //}
-        }
+        Physics.Raycast(cam.transform.position, cam.transform.forward, out var hit, interactDistance);
+            if (hit.collider.CompareTag("Dog"))
+            {
+                Destroy(hit.collider.gameObject);
+                Debug.Log("Dog picked up");
+                dogInBag = true;
+            }
+        
     }
 }
