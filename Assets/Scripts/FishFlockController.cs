@@ -4,8 +4,7 @@ using UnityEngine;
 public class FishFlockController : MonoBehaviour
 {
     public Vector3 bound;
-    public float speed = 100.0f;
-    public float targetReachedRadius = 10.0f;
+    public float speed = 10f;
     private Vector3 initialPosition;
     private Vector3 nextMovementPoint;
     // Use this for initialization
@@ -13,6 +12,7 @@ public class FishFlockController : MonoBehaviour
     {
         initialPosition = transform.position;
         CalculateNextMovementPoint();
+        speed = Random.Range(speed * 0.5f, speed * 1.5f);
     }
     // Update is called once per frame
     void Update()

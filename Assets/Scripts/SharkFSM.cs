@@ -33,6 +33,7 @@ public class SharkFSM : FSM
     private Animator animator;
     private PlayerStats playerStats;
     private int cooldownValue = 7;
+    private float underwaterLevel = -2.3f;
 
 
     protected override void Initialize()
@@ -106,20 +107,20 @@ public class SharkFSM : FSM
 
         if (Vector3.Distance(transform.position, destPos) <= patrollingRadius)
         {
-            print("Point reached, get next point");
+            //print("Point reached, get next point");
             FindNextPoint();
         }
 
         else if (Vector3.Distance(transform.position, playerTransform.position) <= chaseRange && playerTransform.position.y < 0)
         {
-            print("player close, change to chase state");
+           // print("player close, change to chase state");
             curState = SharkState.Chase;
         }
     }
 
     protected void UpdateChaseState()
     {
-        if (playerTransform.position.y < -2.3f)
+        if (playerTransform.position.y < -underwaterLevel)
         {
             animator.SetBool("Chasing", true);
             curSpeed = 15f;
@@ -127,14 +128,14 @@ public class SharkFSM : FSM
             Move();
             if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange)
             {
-                print("player in attack range, attack and change to cooldown state");
+               // print("player in attack range, attack and change to cooldown state");
                 playerStats.TakeDamage(45);
                 curState = SharkState.Cooldown;
                 StartCoroutine(CooldownTimer());
             }
             else if (Vector3.Distance(transform.position, playerTransform.position) >= chaseRange)
             {
-                print("player escaped, change to patrol state");
+               // print("player escaped, change to patrol state");
                 FindNextPoint();
                 animator.SetBool("Chasing", false);
                 curState = SharkState.Patrol;
@@ -142,7 +143,7 @@ public class SharkFSM : FSM
         }
         else
         {
-            print("player is on land, change to patrol state");
+           // print("player is on land, change to patrol state");
             FindNextPoint();
             animator.SetBool("Chasing", false);
             curState = SharkState.Patrol;
@@ -151,7 +152,7 @@ public class SharkFSM : FSM
 
     protected void UpdateCooldownState()
     {
-        // this sucks.
+        // attack cooldown
         animator.SetBool("Chasing", false);
         curSpeed = 4f;
         Vector3 recoverPoint = transform.forward * -20f;
@@ -162,7 +163,7 @@ public class SharkFSM : FSM
     IEnumerator CooldownTimer()
     {
         yield return new WaitForSeconds(cooldownValue);
-        print("Cooldown over, change to patrol state");
+        //print("Cooldown over, change to patrol state");
         curState = SharkState.Patrol;
     }
   
@@ -184,7 +185,7 @@ public class SharkFSM : FSM
     IEnumerator DeathRemove()
     {
         deadLimit = true;
-        Debug.Log("Shark is dead, start death timer");
+        //Debug.Log("Shark is dead, start death timer");
         yield return new WaitForSeconds(9.98f);
         Destroy(gameObject);
     }
