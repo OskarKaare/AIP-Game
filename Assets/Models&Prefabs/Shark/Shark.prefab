@@ -577,6 +577,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2479380500270512023}
   - component: {fileID: 431162826138353782}
+  - component: {fileID: 2020100891671774177}
+  - component: {fileID: 4391080112209336334}
   m_Layer: 0
   m_Name: Shark
   m_TagString: Untagged
@@ -623,6 +625,54 @@ MonoBehaviour:
   patrollingRadius: 2
   chaseRange: 75
   attackRange: 15
+--- !u!65 &2020100891671774177
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3990717746402495141}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 7.0805817, y: 6.527134, z: 23.715698}
+  m_Center: {x: -0.059020996, y: 2.8938503, z: 0.61647797}
+--- !u!54 &4391080112209336334
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3990717746402495141}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 55
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!1 &4143137814916538218
 GameObject:
   m_ObjectHideFlags: 0

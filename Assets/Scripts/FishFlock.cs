@@ -23,6 +23,10 @@ public class FishFlock : MonoBehaviour
     public float followVelocity = 4f;
     public float followRadius = 40f;
 
+    // player variables
+    public float playerAvoidanceRadius = 50f;
+    public float playerAvoidanceForce = 150f;
+
 
 
     //these variables control the movement of the boid
@@ -35,7 +39,8 @@ public class FishFlock : MonoBehaviour
     private FishFlock[] otherFlocks;
     private Transform transformComponent;
     private float randomFreqInterval;
-    public float waterlevel = -1f;
+    public float waterlevel;
+    private Transform playerTransform;
 
     void Start()
     {
@@ -67,6 +72,10 @@ public class FishFlock : MonoBehaviour
         // Calculate random push depends on the random
         // frequency provided
         StartCoroutine(UpdateRandom());
+
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+            playerTransform = player.transform;
 
     }
     IEnumerator UpdateRandom()
@@ -148,22 +157,35 @@ public class FishFlock : MonoBehaviour
             velocity = (velocity / speed) * minSpeed;
         }
 
-        // final velocity calculations
-        Vector3 wantedVel = velocity;
+        Vector3 playerPush = Vector3.zero;
+        if (playerTransform != null)
+        {
+            Vector3 toPlayer = myPosition - playerTransform.position;
+            float playerDist = toPlayer.magnitude;
+            if (playerDist < playerAvoidanceRadius && playerDist > 0f)
+            {
+                float strength = 1f - (playerDist / playerAvoidanceRadius);
+                playerPush = (toPlayer / playerDist) * strength * playerAvoidanceForce;
+            }
+
+        }
+            // final velocity calculations
+            Vector3 wantedVel = velocity;
         wantedVel -= wantedVel * Time.deltaTime;
         wantedVel += randomPush * Time.deltaTime;
         wantedVel += originPush * Time.deltaTime;
         wantedVel += avgVelocity * Time.deltaTime;
+        wantedVel += playerPush * Time.deltaTime;
 
-        // gravity limitations, we dont want the fish to be able to "fly"
-        Vector3 gravityPush = gravity * Time.deltaTime * toAvg.normalized;
+            // gravity limitations, we dont want the fish to be able to "fly"
+            Vector3 gravityPush = gravity * Time.deltaTime * toAvg.normalized;
         if (myPosition.y >= waterlevel && gravityPush.y > waterlevel)
         {
             gravityPush.y = 0f;
         }
         wantedVel += gravityPush;
 
-        // Prevent the fish from gaining velocity that would push it above water level
+        // Prevent foid from gaining velocity that would push it above water level
         float projectedNextY = transformComponent.position.y + wantedVel.y * Time.deltaTime;
         if (projectedNextY > waterlevel)
         {
@@ -171,7 +193,7 @@ public class FishFlock : MonoBehaviour
         }
 
         velocity = Vector3.RotateTowards(velocity, wantedVel, turnSpeed * Time.deltaTime, 100.00f);
-        // Ensure final velocity doesn't push above Y = 0
+        // check if foid is above water level, if so, set the vertical velocity to 0.
         float projectedFinalNextY = transformComponent.position.y + velocity.y * Time.deltaTime;
         if (projectedFinalNextY > waterlevel)
         {
