@@ -176,12 +176,13 @@ public class SharkFSM : FSM
 
         float angle = Vector3.Angle(camForward, toShark);
         if (angle > 90f)
-        {
             curState = SharkState.Chase;
-        }
+       
+        else if (Vector3.Distance(transform.position, playerTransform.position) <= attackRange)
+            curState = SharkState.Chase;
+
         else if (Vector3.Distance(transform.position, playerTransform.position) >= chaseRange)
         {
-
             FindNextPoint();
             curState = SharkState.Patrol;
         }
@@ -263,14 +264,20 @@ public class SharkFSM : FSM
         // attack cooldown
         animator.SetBool("Chasing", false);
         curSpeed = 15f;
-        Vector3 recoverPoint = transform.position + new Vector3(20,0,0);
+        Vector3 recoverPoint = transform.position + transform.forward * 20f;
+        recoverPoint.y = transform.position.y;
         destPos = recoverPoint;
-        Move();
-    }
+
+        Vector3 flatForward = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
+        Quaternion flatRotation = Quaternion.LookRotation(flatForward);
+        sharkRb.rotation = Quaternion.Slerp(transform.rotation, flatRotation, Time.deltaTime * curRotSpeed);
+        sharkRb.MovePosition(transform.position + flatForward * curSpeed * Time.deltaTime);
+    
+}
 
     IEnumerator CooldownTimer()
     {
-        yield return new WaitForSeconds(cooldownValue);
+        yield return new WaitForSeconds(Random.Range(cooldownValue-2, cooldownValue+2));
         //print("Cooldown over, change to patrol state");
         curState = SharkState.Patrol;
     }
