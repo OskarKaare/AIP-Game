@@ -62,6 +62,7 @@ public class FishFlock : MonoBehaviour
         otherFlocks = new FishFlock[tempFlocks.Length];
         for (int i = 0; i < tempFlocks.Length; i++)
         {
+            if (objects == null) continue;
             objects[i] = tempFlocks[i].transform;
             otherFlocks[i] = (FishFlock)tempFlocks[i];
 
@@ -100,6 +101,7 @@ public class FishFlock : MonoBehaviour
         for (int i = 0; i < objects.Length; i++)
         {
             Transform boidTransform = objects[i];
+            if (boidTransform == null) continue;
             if (boidTransform != transformComponent)
             {
                 Vector3 otherPosition = boidTransform.position;
@@ -129,6 +131,7 @@ public class FishFlock : MonoBehaviour
                         }
                         forceMagnitude = directionMagnitude / followRadius;
                         FishFlock tempOtherBoid = otherFlocks[i];
+                        if (tempOtherBoid == null) continue;
                         avgVelocity += followVelocity * forceMagnitude * tempOtherBoid.normalizedVelocity;
                     }
                 }

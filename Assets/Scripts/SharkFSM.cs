@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Timers;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -11,6 +12,7 @@ public class SharkFSM : FSM
     {
         Patrol,
         Lurk,
+        Hunt,
         Chase,
         Cooldown,
         Dead,
@@ -36,6 +38,8 @@ public class SharkFSM : FSM
     private int cooldownValue = 7;
     private float underwaterLevel = -2.3f;
     private Rigidbody sharkRb;
+    private Transform[] fishTransforms;
+    private Transform nearest;
 
 
     protected override void Initialize()
@@ -66,6 +70,31 @@ public class SharkFSM : FSM
         animator = GetComponentInChildren<Animator>();
         sharkRb = GetComponent<Rigidbody>();
 
+        FishFlock[] fishFlocks = Object.FindObjectsByType<FishFlock>(FindObjectsSortMode.None);
+        fishTransforms = new Transform[fishFlocks.Length];
+        for (int i = 0; i < fishFlocks.Length; i++)
+        {
+            fishTransforms[i] = fishFlocks[i].transform;
+        }
+
+    }
+
+    private Transform FindNearestFish()
+    {
+        Transform nearest = null;
+        float nearestDist = Mathf.Infinity;
+
+        foreach (Transform fish in fishTransforms)
+        {
+            if (fish == null) continue; 
+            float dist = Vector3.Distance(transform.position, fish.position);
+            if (dist < nearestDist)
+            {
+                nearestDist = dist;
+                nearest = fish;
+            }
+        }
+        return nearest; 
     }
     protected void FindNextPoint()
     {
@@ -87,6 +116,9 @@ public class SharkFSM : FSM
                 break;
             case SharkState.Lurk:
                 UpdateLurkState();
+                break;
+            case SharkState.Hunt:
+                UpdateHuntState();
                 break;
             case SharkState.Chase:
                 UpdateChaseState();
@@ -122,13 +154,18 @@ public class SharkFSM : FSM
             // print("player close, change to chase state");
             curState = SharkState.Lurk;
         }
+        else if (Vector3.Distance(transform.position, FindNearestFish().position) <= chaseRange)
+        {
+            // print("fish close, change to hunt state");
+            curState = SharkState.Hunt;
+        }
     }
 
     protected void UpdateLurkState()
     {
         // dive down below the player
         curSpeed = 25f;
-        destPos = new Vector3(playerTransform.position.x, playerTransform.position.y -75f, playerTransform.position.z);
+        destPos = new Vector3(playerTransform.position.x, playerTransform.position.y + Random.Range(-25, -85), playerTransform.position.z);
         Move();
 
         // chase when player looks away, and if they escape go to patrol
@@ -144,15 +181,53 @@ public class SharkFSM : FSM
         }
         else if (Vector3.Distance(transform.position, playerTransform.position) >= chaseRange)
         {
-         
+
             FindNextPoint();
             curState = SharkState.Patrol;
         }
     }
+    protected void UpdateHuntState()
+    {
+        nearest = FindNearestFish(); 
+        if (nearest == null)
+        {
+            curState = SharkState.Patrol;
+            return;
+        }
+
+        // if player is close, prioritize player over fish
+        if (Vector3.Distance(transform.position, playerTransform.position) <= chaseRange && playerTransform.position.y < 0)
+        {
+            curState = SharkState.Lurk;
+            animator.SetBool("Chasing", false);
+            return;
+        }
+
+        animator.SetBool("Chasing", true);
+        curSpeed = 75f;
+        destPos = nearest.position;
+        Move();
+
+        if (Vector3.Distance(transform.position, nearest.position) <= attackRange)
+        {
+            // fish caught
+            Destroy(nearest.gameObject);
+            animator.SetBool("Chasing", false);
+            curState = SharkState.Cooldown;
+            StartCoroutine(CooldownTimer());
+        }
+        else if (Vector3.Distance(transform.position, nearest.position) >= chaseRange)
+        {
+            // fish escaped
+            animator.SetBool("Chasing", false);
+            curState = SharkState.Patrol;
+        }
+
+    }
 
     protected void UpdateChaseState()
     {
-        if (playerTransform.position.y < -underwaterLevel)
+        if (playerTransform.position.y < underwaterLevel && Vector3.Distance(transform.position, playerTransform.position) <= chaseRange)
         {
             animator.SetBool("Chasing", true);
             curSpeed = 75f;
@@ -180,6 +255,7 @@ public class SharkFSM : FSM
             animator.SetBool("Chasing", false);
             curState = SharkState.Patrol;
         }
+
     }
 
     protected void UpdateCooldownState()
@@ -187,7 +263,7 @@ public class SharkFSM : FSM
         // attack cooldown
         animator.SetBool("Chasing", false);
         curSpeed = 15f;
-        Vector3 recoverPoint = transform.forward * -20f;
+        Vector3 recoverPoint = transform.position + new Vector3(20,0,0);
         destPos = recoverPoint;
         Move();
     }
@@ -206,6 +282,7 @@ public class SharkFSM : FSM
         Quaternion targetRotation = Quaternion.LookRotation(dir);
         sharkRb.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * curRotSpeed);
         sharkRb.MovePosition(transform.position + transform.forward * curSpeed * Time.deltaTime);
+
     }
 
     public void TakeDamage(int damage)
