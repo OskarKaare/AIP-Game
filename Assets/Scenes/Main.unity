@@ -21509,7 +21509,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8089202c1f1d02d46af73c00f5b0bcf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  mouseSpeed: 0.5
+  mouseSpeed: 0.1
   minLookAngle: -90
   maxLookAngle: 90
 --- !u!136 &2144495994
@@ -25183,6 +25183,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1368828157}
     m_Modifications:
+    - target: {fileID: 4099755071078331308, guid: bb8a0e793900a0d439793e6ab5dfff23, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 07c5d90f84ab5994992c02571afdd506, type: 2}
+    - target: {fileID: 5620080337526488830, guid: bb8a0e793900a0d439793e6ab5dfff23, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5695411095727880041, guid: bb8a0e793900a0d439793e6ab5dfff23, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5695411095727880041, guid: bb8a0e793900a0d439793e6ab5dfff23, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6131732049135390693, guid: bb8a0e793900a0d439793e6ab5dfff23, type: 3}
       propertyPath: m_LocalPosition.x
       value: 79.63591
@@ -25223,6 +25239,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6863774917346872326, guid: bb8a0e793900a0d439793e6ab5dfff23, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 07c5d90f84ab5994992c02571afdd506, type: 2}
     - target: {fileID: 8789020850728069847, guid: bb8a0e793900a0d439793e6ab5dfff23, type: 3}
       propertyPath: m_Name
       value: FishFlockController
