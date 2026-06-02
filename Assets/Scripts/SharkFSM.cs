@@ -165,7 +165,8 @@ public class SharkFSM : FSM
     {
         // dive down below the player
         curSpeed = 25f;
-        destPos = new Vector3(playerTransform.position.x, playerTransform.position.y + Random.Range(-25, -85), playerTransform.position.z);
+        destPos = new Vector3(playerTransform.position.x, playerTransform.position.y + 
+            Random.Range(-25, -85), playerTransform.position.z);
         Move();
 
         // chase when player looks away, and if they escape go to patrol

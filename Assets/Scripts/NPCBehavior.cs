@@ -20,7 +20,6 @@ public class NPCBehavior : MonoBehaviour
     {
         Vector3 dir = playerTransform.position - transform.position;
 
-
         float yaw = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.Euler(0f, yaw, 0f);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);

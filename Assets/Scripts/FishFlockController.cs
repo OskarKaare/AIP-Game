@@ -1,33 +1,26 @@
-using System.Security.Cryptography;
 using UnityEngine;
 
 public class FishFlockController : MonoBehaviour
 {
-    public Vector3 bound;
-    public float speed = 10f;
-    private Vector3 initialPosition;
-    private Vector3 nextMovementPoint;
-    // Use this for initialization
+    public float speed = 1f;
+    public float radius = 20f;
+
+    private Vector3 center;
+    private float angle = 0f;
+
     void Start()
     {
-        initialPosition = transform.position;
-        CalculateNextMovementPoint();
-        speed = Random.Range(speed * 0.5f, speed * 1.5f);
+        center = transform.position;
+        speed = Random.Range(speed * 0.8f, speed * 1.2f);
     }
-    // Update is called once per frame
+
     void Update()
     {
-        transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(nextMovementPoint - transform.position), 1.0f * Time.deltaTime);
+        angle += speed * Time.deltaTime;
 
-     
-    }
-    void CalculateNextMovementPoint()
-    {
+        Vector3 newPos = new Vector3(center.x + Mathf.Cos(angle) * radius, center.y,center.z + Mathf.Sin(angle) * radius);
 
-        float posX = Random.Range(-bound.x, bound.x);
-        float posY = Random.Range(-bound.y, bound.y);
-        float posZ = Random.Range(-bound.z, bound.z);
-        nextMovementPoint = initialPosition + new Vector3(posX, posY, posZ);
+        transform.LookAt(newPos);
+        transform.position = newPos;
     }
 }

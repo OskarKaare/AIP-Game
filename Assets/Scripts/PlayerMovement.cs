@@ -40,23 +40,23 @@ public class PlayerMovement : MonoBehaviour
         //Vertical();
     }
 
-    
+
     void MovementStyle()
-        {
+    {
         if (transform.position.y > stateSwitchHeight)
         {
             Walk();
         }
-        else 
+        else
         {
             Swim();
         }
     }
 
     void Walk()
-    {    
+    {
         Vector2 input = InputSystem.actions["Move"].ReadValue<Vector2>();
-        Vector3 move = (transform.right * input.x + transform.forward * input.y) *walkSpeed ;
+        Vector3 move = (transform.right * input.x + transform.forward * input.y) * walkSpeed;
         verticalSpeed = -9f;
         move.y = verticalSpeed;
 
@@ -77,41 +77,41 @@ public class PlayerMovement : MonoBehaviour
     void Swim()
     {
         Vector2 input = InputSystem.actions["Move"].ReadValue<Vector2>();
-        Vector3 targetVelocity = new Vector3(0,0,0);
-       
+        Vector3 targetVelocity = new Vector3(0, 0, 0);
+
 
         if (input.magnitude > 0.1f)
         {
 
             targetVelocity = (playerCamera.transform.right * input.x + playerCamera.transform.forward * input.y) * swimSpeed;
         }
-    
+
         else
         {
             targetVelocity = Vector3.zero;
         }
 
-    
+
         float lerpSpeed = input.magnitude > 0.1f ? swimDrift : 1f / decelerationTime;
         currentVelocity = Vector3.Lerp(currentVelocity, targetVelocity, Time.deltaTime * lerpSpeed);
         currentVelocity = Vector3.ClampMagnitude(currentVelocity, maxSpeed);
         controller.Move(currentVelocity * Time.deltaTime);
 
-     // vertical
+        // vertical
         float targetVerticalVelocity = 0f;
         verticalSpeed = 50f;
         if (InputSystem.actions["Jump"].IsPressed())
         {
             targetVerticalVelocity = verticalSpeed;
         }
-        else if(InputSystem.actions["Crouch"].IsPressed())
+        else if (InputSystem.actions["Crouch"].IsPressed())
         {
             targetVerticalVelocity = -verticalSpeed;
         }
         float verticalLerpSpeed = Mathf.Abs(targetVerticalVelocity) > 0.1f ? swimDrift : 1f / decelerationTime;
         currentVerticalVelocity = Mathf.Lerp(currentVerticalVelocity, targetVerticalVelocity, Time.deltaTime * verticalLerpSpeed);
         controller.Move(Vector3.up * currentVerticalVelocity * Time.deltaTime);
-      
+
 
         if (transform.position.y <= -stateSwitchHeight)
         {
@@ -133,7 +133,7 @@ public class PlayerMovement : MonoBehaviour
 
         //Debug.Log(currentVelocity.magnitude);
     }
-  
+
 
     void Look()
     {

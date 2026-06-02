@@ -172,15 +172,15 @@ public class FishFlock : MonoBehaviour
             }
 
         }
-            // final velocity calculations
-            Vector3 wantedVel = velocity;
+         
+        Vector3 wantedVel = velocity;
         wantedVel -= wantedVel * Time.deltaTime;
         wantedVel += randomPush * Time.deltaTime;
         wantedVel += originPush * Time.deltaTime;
         wantedVel += avgVelocity * Time.deltaTime;
         wantedVel += playerPush * Time.deltaTime;
 
-            // gravity limitations, we dont want the fish to be able to "fly"
+            // gravity limitations, dont want the fish to be able to "fly"
             Vector3 gravityPush = gravity * Time.deltaTime * toAvg.normalized;
         if (myPosition.y >= waterlevel && gravityPush.y > waterlevel)
         {
