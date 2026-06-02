@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PatrolPoint
   - Dog
+  - Coral
   layers:
   - Default
   - TransparentFX
