@@ -21,6 +21,7 @@ public class FishFlockController : MonoBehaviour
         Vector3 newPos = new Vector3(center.x + Mathf.Cos(angle) * radius, center.y,center.z + Mathf.Sin(angle) * radius);
 
         transform.LookAt(newPos);
+
         transform.position = newPos;
     }
 }

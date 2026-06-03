@@ -37,7 +37,9 @@ public class SharkFSM : FSM
     private PlayerStats playerStats;
     private int cooldownValue = 7;
     private float underwaterLevel = -2.3f;
+    // rigidbody for collisions and movement
     private Rigidbody sharkRb;
+    //detect nearest fish
     private Transform[] fishTransforms;
     private Transform nearest;
 
@@ -57,7 +59,7 @@ public class SharkFSM : FSM
         }
         if (patrolPoints != null && patrolPoints.Count > 0)
         {
-            FindNextPoint();
+            NextDestPos();
         }
         else
         {
@@ -97,7 +99,7 @@ public class SharkFSM : FSM
         }
         return nearest; 
     }
-    protected void FindNextPoint()
+    protected void NextDestPos()
     {
         if (patrolPoints == null || patrolPoints.Count == 0)
         {
@@ -146,7 +148,7 @@ public class SharkFSM : FSM
         if (Vector3.Distance(transform.position, destPos) <= patrollingRadius)
         {
             //print("Point reached, get next point");
-            FindNextPoint();
+            NextDestPos();
         }
 
         else if (Vector3.Distance(transform.position, playerTransform.position) <= chaseRange && playerTransform.position.y < 0)
@@ -165,8 +167,7 @@ public class SharkFSM : FSM
     {
         // dive down below the player
         curSpeed = 25f;
-        destPos = new Vector3(playerTransform.position.x, playerTransform.position.y + 
-            Random.Range(-25, -85), playerTransform.position.z);
+        destPos = new Vector3(playerTransform.position.x, playerTransform.position.y + Random.Range(-25, -85), playerTransform.position.z);
         Move();
 
         // chase when player looks away, and if they escape go to patrol
@@ -184,7 +185,7 @@ public class SharkFSM : FSM
 
         else if (Vector3.Distance(transform.position, playerTransform.position) >= chaseRange)
         {
-            FindNextPoint();
+            NextDestPos();
             curState = SharkState.Patrol;
         }
     }
@@ -245,7 +246,7 @@ public class SharkFSM : FSM
             else if (Vector3.Distance(transform.position, playerTransform.position) >= chaseRange)
             {
                 // print("player escaped, change to patrol state");
-                FindNextPoint();
+                NextDestPos();
                 animator.SetBool("Chasing", false);
                 curState = SharkState.Patrol;
             }
@@ -253,7 +254,7 @@ public class SharkFSM : FSM
         else
         {
             // print("player is on land, change to patrol state");
-            FindNextPoint();
+            NextDestPos();
             animator.SetBool("Chasing", false);
             curState = SharkState.Patrol;
         }

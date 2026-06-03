@@ -27,8 +27,6 @@ public class FishFlock : MonoBehaviour
     public float playerAvoidanceRadius = 50f;
     public float playerAvoidanceForce = 150f;
 
-
-
     //these variables control the movement of the boid
     private Transform origin;
     private Vector3 velocity;
@@ -104,13 +102,10 @@ public class FishFlock : MonoBehaviour
                 // Only consider other boids that are at or below Y = 0
                 if (otherPosition.y <= 0f)
                 {
-                   
                     avgPosition += otherPosition;
                     count++;
-
                     //Directional vector from other flock to this flock
                     forceV = myPosition - otherPosition;
-
                     //Magnitude of that directional
                     //vector(Length)
                     float directionMagnitude = forceV.magnitude;
@@ -167,7 +162,7 @@ public class FishFlock : MonoBehaviour
             }
 
         }
-         // sum up of all forces
+        // sum up of all forces
         Vector3 wantedVel = velocity;
         wantedVel -= wantedVel * Time.deltaTime;
         wantedVel += randomPush * Time.deltaTime;
@@ -175,20 +170,18 @@ public class FishFlock : MonoBehaviour
         wantedVel += avgVelocity * Time.deltaTime;
         wantedVel += playerPush * Time.deltaTime;
 
-            // gravity limitations, dont want the fish to fly
-            Vector3 gravityPush = gravity * Time.deltaTime * toAvg.normalized;
+        // gravity limitations, dont want the fish to fly
+        Vector3 gravityPush = gravity * Time.deltaTime * toAvg.normalized;
         if (myPosition.y >= waterlevel && gravityPush.y > waterlevel)
-        {
             gravityPush.y = 0f;
-        }
+
         wantedVel += gravityPush;
 
         // Prevent foid from gaining velocity that would push it above water level
         float projectedNextY = transformComponent.position.y + wantedVel.y * Time.deltaTime;
         if (projectedNextY > waterlevel)
-        {
             wantedVel.y = 0f;
-        }
+
 
         velocity = Vector3.RotateTowards(velocity, wantedVel, turnSpeed * Time.deltaTime, 100.00f);
         // check if foid is above water level, if so, set the vertical velocity to 0.
