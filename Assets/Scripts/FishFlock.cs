@@ -45,35 +45,31 @@ public class FishFlock : MonoBehaviour
     void Start()
     {
         randomFreqInterval = 1f / randomFreq;
-        // Assign the parent as origin
         origin = transform.parent;
-        // Flock transform
         transformComponent = transform;
-        // Temporary components
         Component[] tempFlocks = null;
-        // Get all the unity flock components from the parent
-        // transform in the group
         if (transform.parent)
         {
             tempFlocks = transform.parent.GetComponentsInChildren<FishFlock>();
         }
-        // Assign and store all the flock objects in this group
+        // Adds all members of the flock
         objects = new Transform[tempFlocks.Length];
         otherFlocks = new FishFlock[tempFlocks.Length];
         for (int i = 0; i < tempFlocks.Length; i++)
         {
+            // null check to prevent errors if a shark has killed a member of the flock
             if (objects == null) continue;
             objects[i] = tempFlocks[i].transform;
             otherFlocks[i] = (FishFlock)tempFlocks[i];
 
         }
-        // Null Parent as the flock leader will be
-        // UnityFlockController object
+        // Unparent the boids so they can move independently, the leader is the Fish Flock controller object
         transform.parent = null;
-        // Calculate random push depends on the random
-        // frequency provided
+
+        // coroutine that updates the random push at a random interval based on the random frequency variable
         StartCoroutine(UpdateRandom());
 
+        // player transform for player avoidance behavior
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
             playerTransform = player.transform;
@@ -89,8 +85,7 @@ public class FishFlock : MonoBehaviour
     }
     void Update()
     {
-        //SEPARATION
-        //Internal variables
+        // speed of boid
         float speed = velocity.magnitude;
         Vector3 avgVelocity = Vector3.zero;
         Vector3 avgPosition = Vector3.zero;
@@ -109,7 +104,7 @@ public class FishFlock : MonoBehaviour
                 // Only consider other boids that are at or below Y = 0
                 if (otherPosition.y <= 0f)
                 {
-                    // Average position to calculate cohesion
+                   
                     avgPosition += otherPosition;
                     count++;
 
@@ -172,7 +167,7 @@ public class FishFlock : MonoBehaviour
             }
 
         }
-         
+         // sum up of all forces
         Vector3 wantedVel = velocity;
         wantedVel -= wantedVel * Time.deltaTime;
         wantedVel += randomPush * Time.deltaTime;
@@ -180,7 +175,7 @@ public class FishFlock : MonoBehaviour
         wantedVel += avgVelocity * Time.deltaTime;
         wantedVel += playerPush * Time.deltaTime;
 
-            // gravity limitations, dont want the fish to be able to "fly"
+            // gravity limitations, dont want the fish to fly
             Vector3 gravityPush = gravity * Time.deltaTime * toAvg.normalized;
         if (myPosition.y >= waterlevel && gravityPush.y > waterlevel)
         {

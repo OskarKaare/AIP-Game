@@ -79,6 +79,7 @@ public class SharkFSM : FSM
 
     }
 
+    // always check for nearest fish while patrolling and hunting
     private Transform FindNearestFish()
     {
         Transform nearest = null;
@@ -104,8 +105,7 @@ public class SharkFSM : FSM
             return;
         }
         int randomIndex = Random.Range(0, patrolPoints.Count);
-        Vector3 offsetVector = new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10));
-        destPos = patrolPoints[randomIndex] + offsetVector;
+        destPos = patrolPoints[randomIndex];
     }
     protected override void FSMUpdate()
     {

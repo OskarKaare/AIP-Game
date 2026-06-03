@@ -44,13 +44,9 @@ public class PlayerMovement : MonoBehaviour
     void MovementStyle()
     {
         if (transform.position.y > stateSwitchHeight)
-        {
             Walk();
-        }
-        else
-        {
+        else 
             Swim();
-        }
     }
 
     void Walk()
